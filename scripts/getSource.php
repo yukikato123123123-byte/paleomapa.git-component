@@ -2,12 +2,20 @@
 
 $config = require '../db/db_config.php';
 $dsn = "pgsql:host={$config['host']};dbname={$config['dbname']}";
-$pdo = new PDO($dsn, $config['user'], $config['pass']);
 
-$sql = 'SELECT DISTINCT "source" FROM findings';
+try {
 
-$sql-> $pdo->query($sql);
+    $pdo = new PDO($dsn, $config['user'], $config['pass']);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-$result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $sql = 'SELECT DISTINCT "source" FROM findings';
+    $stmt = $pdo->query($sql);
 
-echo json_encode($result);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode($result);
+
+} catch (PDOException $e) {
+
+    echo json_encode(['error' => $e->getMessage()]);
+}
